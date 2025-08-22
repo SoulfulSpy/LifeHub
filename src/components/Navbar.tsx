@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Globe, Home, Compass, BookOpen, User, LogIn } from 'lucide-react';
 
 interface NavbarProps {
@@ -8,7 +7,6 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate }) => {
-  const navigate = useNavigate();
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
     { id: 'dashboard', label: 'Explore', icon: Compass },
@@ -53,10 +51,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate }) => {
 
             {/* Login Button */}
             <div className="flex items-center space-x-4">
-              <button
-                className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 hover:scale-105"
-                onClick={() => navigate('/login')}
-              >
+              <button className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 hover:scale-105">
                 <LogIn className="w-4 h-4" />
                 <span className="text-sm font-medium">Login</span>
               </button>

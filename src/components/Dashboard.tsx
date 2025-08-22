@@ -125,12 +125,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onViewProfile }) => {
             </div>
 
             {/* Category Filter */}
-            <div className="flex items-center space-x-2">
-              <Filter className="w-5 h-5 text-gray-400" />
+            <div className="relative flex items-center space-x-2">
+              <Filter className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-4 py-3 backdrop-blur-lg bg-white/5 border border-white/20 rounded-xl text-white focus:border-blue-400/50 transition-all duration-300"
+                className="pl-10 pr-4 py-3 w-full backdrop-blur-lg bg-white/5 border border-white/20 rounded-xl text-gray-900 dark:text-white focus:border-blue-400/50 transition-all duration-300 appearance-none"
+                style={{ colorScheme: 'light' }}
               >
                 <option value="all">All Categories</option>
                 <option value="music">Music</option>
@@ -143,12 +144,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onViewProfile }) => {
             </div>
 
             {/* Location Filter */}
-            <div className="flex items-center space-x-2">
-              <MapPin className="w-5 h-5 text-gray-400" />
+            <div className="relative flex items-center space-x-2">
+              <MapPin className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
               <select
                 value={selectedLocation}
                 onChange={(e) => setSelectedLocation(e.target.value)}
-                className="px-4 py-3 backdrop-blur-lg bg-white/5 border border-white/20 rounded-xl text-white focus:border-blue-400/50 transition-all duration-300"
+                className="pl-10 pr-4 py-3 w-full backdrop-blur-lg bg-white/5 border border-white/20 rounded-xl text-gray-900 dark:text-white focus:border-blue-400/50 transition-all duration-300 appearance-none"
+                style={{ colorScheme: 'light' }}
               >
                 <option value="all">All Locations</option>
                 {locations.slice(1).map(location => (
