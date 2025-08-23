@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, MapPin, Star, Coins, MessageCircle, Send, Globe, Award, Heart } from 'lucide-react';
+import { ArrowLeft, MapPin, Star, Coins, MessageCircle, Send, Globe, Award, Heart, User } from 'lucide-react';
 
 interface Profile {
   id: number;
@@ -16,22 +16,35 @@ interface Profile {
 interface ProfileViewProps {
   profile: Profile | null;
   onBack: () => void;
+  onEdit?: () => void;
 }
 
-const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack }) => {
+const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack, onEdit }) => {
   if (!profile) return null;
 
+  // onBack is required for type compatibility, but not used directly
   return (
     <div className="min-h-screen px-4 pt-24 pb-12">
       <div className="max-w-4xl mx-auto">
-        {/* Back Button */}
-        <button
-          onClick={onBack}
-          className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors mb-6"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Back to Explore</span>
-        </button>
+        {/* Back & Edit Buttons */}
+        <div className="flex items-center gap-4 mb-6">
+          <button
+            onClick={() => window.location.href = '/explore'}
+            className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Back to Explore</span>
+          </button>
+          {onEdit && (
+            <button
+              onClick={onEdit}
+              className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 hover:scale-105 font-semibold"
+            >
+              <User className="w-4 h-4 mr-1" />
+              <span>Edit Profile</span>
+            </button>
+          )}
+        </div>
 
         {/* Profile Header */}
         <div className="backdrop-blur-lg bg-white/10 border border-white/20 shadow-xl rounded-2xl p-8 mb-8">
@@ -52,7 +65,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ profile, onBack }) => {
                 </div>
                 <div className="flex items-center text-gray-300">
                   <Globe className="w-4 h-4 mr-2" />
-                  {profile.languages.join(', ')}
+                  {(Array.isArray(profile.languages) ? profile.languages : []).join(', ')}
                 </div>
               </div>
 

@@ -1,18 +1,37 @@
 import React from 'react';
-import { Globe, Home, Compass, BookOpen, User, LogIn } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Globe, Home, Compass, BookOpen, User, LogIn, LogOut } from 'lucide-react';
 
 interface NavbarProps {
   currentView: string;
   onNavigate: (view: string) => void;
 }
 
+
 const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate }) => {
+  const navigate = useNavigate();
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
     { id: 'dashboard', label: 'Explore', icon: Compass },
     { id: 'knowledge', label: 'Knowledge Capsules', icon: BookOpen },
     { id: 'profile-form', label: 'Profile', icon: User },
   ];
+
+  const [loggedIn, setLoggedIn] = React.useState(Boolean(localStorage.getItem('isLoggedIn')));
+  React.useEffect(() => {
+    const syncLoginState = () => setLoggedIn(Boolean(localStorage.getItem('isLoggedIn')));
+    window.addEventListener('storage', syncLoginState);
+    return () => window.removeEventListener('storage', syncLoginState);
+  }, []);
+  // Also update on navigation
+  React.useEffect(() => {
+    setLoggedIn(Boolean(localStorage.getItem('isLoggedIn')));
+  });
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn');
+    setLoggedIn(false);
+    navigate('/');
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 p-4">
@@ -49,13 +68,25 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate }) => {
               })}
             </div>
 
-            {/* Login Button */}
+            {/* Login/Logout Button */}
             <div className="flex items-center space-x-4">
-              <button className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 hover:scale-105">
-                <LogIn className="w-4 h-4" />
-                <span className="text-sm font-medium">Login</span>
-              </button>
-              
+              {loggedIn ? (
+                <button
+                  className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:from-purple-600 hover:to-blue-700 transition-all duration-300 hover:scale-105"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="text-sm font-medium">Logout</span>
+                </button>
+              ) : (
+                <button
+                  className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 hover:scale-105"
+                  onClick={() => navigate('/login')}
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span className="text-sm font-medium">Login</span>
+                </button>
+              )}
               {/* Mobile menu button */}
               <button className="md:hidden p-2 text-gray-300 hover:text-white">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, X, Save, MapPin, Globe, User } from 'lucide-react';
+import ProfileView from './ProfileView';
 
 interface ProfileFormProps {
   onBack: () => void;
 }
 
+
 const ProfileForm: React.FC<ProfileFormProps> = ({ onBack }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     location: '',
@@ -13,6 +17,50 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onBack }) => {
     offers: [''],
     wants: ['']
   });
+  const [error, setError] = useState('');
+  const [showProfile, setShowProfile] = useState(false);
+  const [profileData, setProfileData] = useState<any>(null);
+  // Get userId from localStorage (set after login)
+  const userId = localStorage.getItem('userId');
+
+  // Redirect to login if not logged in
+  useEffect(() => {
+    if (!localStorage.getItem('isLoggedIn') || !userId) {
+      navigate('/login');
+    }
+  }, [navigate, userId]);
+
+  // Fetch profile data for the current user
+  useEffect(() => {
+    if (!localStorage.getItem('isLoggedIn') || !userId) return;
+    fetch(`http://localhost:5000/profile/${userId}`)
+      .then(res => res.ok ? res.json() : Promise.reject('Profile not found'))
+      .then(data => {
+        const hasProfile = data && (data.name || data.location || data.languages || (data.offers && data.offers.length > 0));
+        setFormData({
+          name: data.name || '',
+          location: data.location || '',
+          languages: data.languages || '',
+          offers: data.offers && data.offers.length ? data.offers : [''],
+          wants: data.wants && data.wants.length ? data.wants : ['']
+        });
+        if (hasProfile) {
+          setProfileData({
+            id: userId,
+            name: data.name,
+            location: data.location,
+            languages: typeof data.languages === 'string' ? data.languages.split(',').map((l: string) => l.trim()) : data.languages,
+            avatar: data.name ? data.name[0].toUpperCase() : 'U',
+            offers: data.offers || [],
+            wants: data.wants || [],
+            rating: 4.8, // Placeholder
+            lifePoints: 50 // Placeholder
+          });
+          setShowProfile(true);
+        }
+      })
+      .catch(() => {});
+  }, [userId]);
 
   const addField = (field: 'offers' | 'wants') => {
     setFormData(prev => ({
@@ -35,6 +83,43 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onBack }) => {
     }));
   };
 
+  // Save profile handler
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    try {
+      const res = await fetch(`http://localhost:5000/profile/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'Failed to save profile.');
+      } else {
+        // Prepare profile data for ProfileView
+        setProfileData({
+          id: userId,
+          name: formData.name,
+          location: formData.location,
+          languages: formData.languages.split(',').map((l) => l.trim()),
+          avatar: formData.name ? formData.name[0].toUpperCase() : 'U',
+          offers: formData.offers.filter((o) => o.trim() !== ''),
+          wants: formData.wants.filter((w) => w.trim() !== ''),
+          rating: 4.8, // Placeholder, replace with real data if available
+          lifePoints: 50 // Placeholder, replace with real data if available
+        });
+        setShowProfile(true);
+      }
+    } catch {
+      setError('Could not connect to server.');
+    }
+  };
+
+  if (showProfile && profileData) {
+    return <ProfileView profile={profileData} onBack={() => setShowProfile(false)} onEdit={() => setShowProfile(false)} />;
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4 pt-20">
       <div className="max-w-2xl mx-auto w-full">
@@ -53,7 +138,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onBack }) => {
 
         {/* Form */}
         <div className="backdrop-blur-lg bg-white/10 border border-white/20 shadow-xl rounded-2xl p-8">
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            {error && <div className="mb-4 text-red-400 text-center">{error}</div>}
             {/* Basic Information */}
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-white flex items-center">

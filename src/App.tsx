@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import ProfileForm from './components/ProfileForm';
@@ -6,6 +7,7 @@ import Dashboard from './components/Dashboard';
 import ProfileView from './components/ProfileView';
 import KnowledgeCapsules from './components/KnowledgeCapsules';
 import Footer from './components/Footer';
+import LoginPage from './components/LoginPage';
 
 function App() {
   const [currentView, setCurrentView] = useState('home');
@@ -44,7 +46,10 @@ function App() {
 
       <div className="relative z-10">
         <Navbar currentView={currentView} onNavigate={setCurrentView} />
-        {renderCurrentView()}
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/*" element={renderCurrentView()} />
+        </Routes>
         <Footer />
       </div>
     </div>
